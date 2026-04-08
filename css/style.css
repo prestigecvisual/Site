@@ -1,2 +1,46 @@
-body{font-family:Arial;padding:20px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+body {
+    font-family: Arial;
+    background: #f1f5f9;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background: #1e293b;
+    color: white;
+    padding: 15px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+}
+
+input, select, button {
+    width: 100%;
+    margin: 5px 0;
+    padding: 8px;
+}
+
+button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.pedido-card {
+    background: #fff;
+    padding: 8px;
+    margin: 5px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
