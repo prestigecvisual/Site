@@ -1,137 +1,58 @@
-function atualizarDashboard() {
+document.addEventListener("DOMContentLoaded", renderAdmin);
 
-    document.getElementById("totalOrc").innerText = sistema.orcamentos.length;
-    document.getElementById("totalPed").innerText = sistema.pedidos.length;
+// ==========================================
+// RENDER ADMIN
+// ==========================================
+function renderAdmin() {
+    limparColunas();
 
-    let total = 0;
+    sistema.pedidos.forEach(p => {
+        const card = criarCard(p);
 
-    sistema.pedidos.forEach(p => total += p.total);
-
-    document.getElementById("faturamento").innerText = total.toFixed(2);
-}
-
-// ================= CLIENTES =================
-function renderClientes() {
-
-    const div = document.getElementById("listaClientes");
-    div.innerHTML = "";
-
-    sistema.orcamentos.forEach(o => {
-
-        const c = o.cliente;
-
-        const el = document.createElement("div");
-
-        el.innerHTML = `
-            <p><b>${c.nome}</b> - ${c.whatsapp}</p>
-            <p>${c.email}</p>
-            <p>${c.endereco}</p>
-            <hr>
-        `;
-
-        div.appendChild(el);
+        document
+            .getElementById(`col-${p.status}`)
+            .appendChild(card);
     });
 }
 
-// ================= ORÇAMENTOS =================
-function renderOrcamentos() {
-
-    const div = document.getElementById("listaOrcamentos");
-    div.innerHTML = "";
-
-    sistema.orcamentos.forEach((o, i) => {
-
-        const el = document.createElement("div");
-
-        el.innerHTML = `
-            <p><b>#${o.numero}</b> - ${o.cliente.nome}</p>
-            <p>Total: R$ ${o.total}</p>
-            <button onclick="aprovarPedido(${i})">Aprovar</button>
-            <button onclick="excluirOrcamento(${i})">Excluir</button>
-            <hr>
-        `;
-
-        div.appendChild(el);
-    });
+// ==========================================
+// LIMPAR
+// ==========================================
+function limparColunas() {
+    ["producao","andamento","finalizado","entregue"]
+        .forEach(c => document.getElementById("col-"+c).innerHTML="");
 }
 
-// ================= PEDIDOS =================
-function renderPedidos() {
+// ==========================================
+// CARD
+// ==========================================
+function criarCard(p) {
+    const div = document.createElement("div");
+    div.className = "pedido-card";
 
-    const div = document.getElementById("listaPedidos");
-    div.innerHTML = "";
+    const cliente = sistema.clientes.find(c=>c.id===p.clienteId);
 
-    sistema.pedidos.forEach((p, i) => {
+    div.innerHTML = `
+        <strong>${cliente?.nome || "Cliente"}</strong><br>
+        R$ ${p.total.toFixed(2)}<br>
+        <button onclick="mudarStatus(${p.id}, 'producao')">Prod</button>
+        <button onclick="mudarStatus(${p.id}, 'andamento')">And</button>
+        <button onclick="mudarStatus(${p.id}, 'finalizado')">Fin</button>
+        <button onclick="mudarStatus(${p.id}, 'entregue')">Ent</button>
+    `;
 
-        const el = document.createElement("div");
-
-        el.innerHTML = `
-            <p><b>#${p.numero}</b> - ${p.cliente.nome}</p>
-            <p>Status: ${p.status}</p>
-            <button onclick="alterarStatus(${i})">Mudar Status</button>
-            <button onclick="excluirPedido(${i})">Excluir</button>
-            <hr>
-        `;
-
-        div.appendChild(el);
-    });
+    return div;
 }
 
-// ================= AÇÕES =================
-function aprovarPedido(index) {
+// ==========================================
+// MUDAR STATUS
+// ==========================================
+function mudarStatus(id, status) {
+    const pedido = sistema.pedidos.find(p => p.id === id);
+    if (!pedido) return;
 
-    const o = sistema.orcamentos[index];
+    pedido.status = status;
 
-    sistema.pedidos.push({
-        ...o,
-        status: "Em produção",
-        dataAprovacao: new Date().toLocaleDateString()
-    });
-
-    sistema.orcamentos.splice(index, 1);
-
-    salvar();
-    atualizarTudo();
+    salvarNoNavegador();
+    renderAdmin();
 }
-
-function alterarStatus(index) {
-
-    const status = prompt("Novo status:");
-
-    sistema.pedidos[index].status = status;
-
-    salvar();
-    atualizarTudo();
-}
-
-function excluirOrcamento(index) {
-    sistema.orcamentos.splice(index, 1);
-    salvar();
-    atualizarTudo();
-}
-
-function excluirPedido(index) {
-    sistema.pedidos.splice(index, 1);
-    salvar();
-    atualizarTudo();
-}
-
-// ================= INIT =================
-function atualizarTudo() {
-    atualizarDashboard();
-    renderClientes();
-    renderOrcamentos();
-    renderPedidos();
-}
-
-function enviarWhatsApp(){
- const numero = "5511922018290";
- const msg = "Orçamento Prestige";
- window.open(`https://wa.me/${numero}?text=${encodeURIComponent(msg)}`);
-}
-
-function enviarEmail(){
- window.location.href = "mailto:prestigecvisual@gmail.com";
-}
-
-atualizarTudo();
